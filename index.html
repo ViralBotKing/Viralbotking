@@ -24,6 +24,18 @@
             --shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.3);
             --border-radius: 12px;
             --font-family: 'Poppins', sans-serif;
+            --pop-shadow: 0 15px 35px rgba(0,0,0,0.4); /* New shadow for pop effect */
+        }
+
+        /* Bold Yellow Text Style */
+        .bold-yellow {
+            color: #FFD700; /* Yellow color */
+            font-weight: 700; /* Keep it bold */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000; /* Small black border effect */
         }
 
         * {
@@ -55,7 +67,7 @@
             padding: 70px 0;
         }
         
-        /* --- On-Load Animation System --- */
+        /* --- Initial Load Animation System --- */
         .animated {
             animation: fadeInUP 0.8s ease-out forwards;
             opacity: 0; /* Start as invisible */
@@ -80,6 +92,48 @@
         .animated.delay-5 { animation-delay: 1.0s; }
         .animated.delay-6 { animation-delay: 1.2s; }
 
+        /* --- NEW: Scroll-in and Click/Tap Animations for Cards --- */
+        /* Keyframes for elements popping in on scroll */
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            75% {
+                transform: translateY(-5px) scale(1.02); /* Slight overshoot for a bouncy feel */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Class for elements that should animate on scroll */
+        .reveal {
+            opacity: 0; /* Hidden by default */
+            transform: translateY(50px) scale(0.9); /* Start slightly down and smaller */
+            transition: none; /* No initial transition */
+        }
+
+        .reveal.active {
+            animation: popIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Bouncy animation */
+        }
+
+        /* Click/Tap effect for cards and buttons */
+        .feature-card:active, 
+        .pricing-card:active,
+        .cta-button:active,
+        .final-cta-button:active {
+            transform: scale(0.98); /* Slight shrink on click for a "press" feel */
+            transition: transform 0.1s ease-out; /* Quick transition */
+        }
+        /* Restore original transitions after click */
+        .feature-card, .pricing-card {
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .cta-button, .final-cta-button {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, filter 0.3s ease;
+        }
 
         /* --- Header --- */
         .page-header {
@@ -221,11 +275,13 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            /* Enhanced hover effect */
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, box-shadow 0.3s ease;
         }
         .feature-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px) scale(1.02); /* Lift and slightly grow */
             background: rgba(255, 255, 255, 0.15);
+            box-shadow: var(--pop-shadow); /* Stronger shadow on hover */
         }
         .feature-icon {
             font-size: 28px;
@@ -257,19 +313,36 @@
             border-radius: var(--border-radius);
             border: 1px solid var(--card-border);
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* Enhanced hover effect */
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
             border-top: 4px solid var(--accent-1);
         }
         .pricing-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transform: translateY(-8px) scale(1.05); /* Lift and grow more */
+            box-shadow: var(--pop-shadow); /* Stronger shadow on hover */
         }
         .pricing-card.popular {
             border-top-color: var(--accent-2);
             transform: scale(1.05);
+            position: relative; /* For the "Most Popular" badge */
+        }
+        .pricing-card.popular::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-2);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .pricing-card.popular:hover {
-            transform: scale(1.1);
+            transform: translateY(-12px) scale(1.1); /* Even more pronounced lift for popular */
         }
         .pricing-card h3 {
             font-size: 20px;
@@ -297,11 +370,12 @@
             font-size: 16px;
             text-decoration: none;
             background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.3s ease; /* Added filter */
         }
         .cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transform: translateY(-3px) scale(1.02); /* Slight lift and grow */
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            filter: brightness(1.1); /* Slight glow effect */
         }
         
         /* --- FAQ Section --- */
@@ -311,10 +385,11 @@
             border-radius: var(--border-radius);
             border: 1px solid var(--card-border);
             overflow: hidden;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         .faq-item:hover {
             background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .faq-item summary {
             font-size: 17px;
@@ -336,10 +411,20 @@
         .faq-item[open] summary::after {
             transform: rotate(45deg);
         }
+
+        /* Enhanced FAQ Answer smooth animation */
         .faq-answer {
-            padding: 0 20px 20px;
+            padding: 0 20px;
             color: var(--text-muted);
             border-top: 1px solid var(--card-border);
+            max-height: 0; /* Start hidden */
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
+        }
+
+        .faq-item[open] .faq-answer {
+            max-height: 200px; /* A value larger than the expected height */
+            padding-bottom: 20px; /* Add bottom padding when open */
         }
 
         /* --- Final CTA Section --- */
@@ -362,13 +447,25 @@
             color: var(--accent-2);
             background: #fff;
             border-radius: 50px;
-            transition: transform 0.3s ease;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease; /* Added filter */
         }
         .final-cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transform: translateY(-5px) scale(1.05); /* Stronger lift and grow */
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            filter: brightness(1.05); /* Slight glow */
         }
+
+        /* NEW: Pulse animation for CTA button */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        .final-cta-button.pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+
         .final-cta-button svg {
             width: 24px;
             height: 24px;
@@ -398,6 +495,37 @@
         @media (min-width: 992px) {
             .features-grid { grid-template-columns: repeat(3, 1fr); }
         }
+
+        /* --- NEW: Click Bubble Animation CSS --- */
+        .click-bubble {
+            position: fixed; /* Fixed position so it follows viewport */
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
+            border-radius: 50%;
+            pointer-events: none; /* Allows clicks to pass through */
+            z-index: 9999; /* Always on top */
+            transform: translate(-50%, -50%); /* Center the bubble on the cursor */
+            opacity: 1;
+            animation: fly-and-fade 1s ease-out forwards; /* 1 second animation */
+            filter: blur(2px); /* Soften the edges */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); /* Subtle glow */
+        }
+
+        @keyframes fly-and-fade {
+            0% {
+                transform: translate(-50%, -50%) scale(0); /* Start tiny */
+                opacity: 0;
+            }
+            10% {
+                transform: translate(-50%, -50%) scale(1); /* Pop to full size quickly */
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -150%) scale(0.5); /* Fly up and shrink */
+                opacity: 0; /* Fade out */
+            }
+        }
     </style>
 </head>
 <body>
@@ -405,7 +533,7 @@
     <header class="page-header">
         <div class="container header-content">
             <div class="logo-container">
-                <img src="https://i.postimg.cc/TwwPPfM0/IMG-20250702-202933-246.jpg" alt="Viral Bot King Logo" class="logo-image">
+                <img src="https://i.postimg.cc/TwwPPfM0/IMG-20250702-204502-Chrome.jpg" alt="Viral Bot King Logo" class="logo-image">
                 <div class="brand-info">
                     <div class="brand-name">Viral Bot King</div>
                     <div class="brand-subtitle">India’s #1 Telegram Promotion</div>
@@ -422,7 +550,7 @@
                 
                 <div class="hero-description animated delay-2">
                     <p>
-                        I’m **Viral Bot King** — I help channels grow with real, active Indian subscribers using my private network of **120+ earning-focused Telegram channels.**
+                        I’m <span class="bold-yellow">Viral Bot King</span> — I help channels grow with real, active Indian subscribers using my private network of <span class="bold-yellow">120+ earning-focused Telegram channels.</span>
                         Promotions are real, fast, and targeted. You get high retention and real value.
                     </p>
                 </div>
@@ -448,27 +576,27 @@
                     <p>I deliver what others only promise: real growth, real users, and real value for your investment.</p>
                 </div>
                 <div class="features-grid">
-                    <div class="feature-card animated delay-1">
+                    <div class="feature-card reveal">
                         <div class="feature-icon">🌐</div>
                         <div class="feature-text">120+ Real Telegram Channels</div>
                     </div>
-                    <div class="feature-card animated delay-2">
+                    <div class="feature-card reveal">
                         <div class="feature-icon">💸</div>
                         <div class="feature-text">Only ₹1 per Active Subscriber</div>
                     </div>
-                    <div class="feature-card animated delay-3">
+                    <div class="feature-card reveal">
                         <div class="feature-icon">🚀</div>
                         <div class="feature-text">200+ Real Subs Daily</div>
                     </div>
-                    <div class="feature-card animated delay-4">
+                    <div class="feature-card reveal">
                         <div class="feature-icon">🎯</div>
                         <div class="feature-text">High Retention, Niche Targeted</div>
                     </div>
-                    <div class="feature-card animated delay-5">
+                    <div class="feature-card reveal">
                         <div class="feature-icon">⏱️</div>
                         <div class="feature-text">1 Day Delivery + 24x7 Support</div>
                     </div>
-                     <div class="feature-card animated delay-6">
+                     <div class="feature-card reveal">
                         <div class="feature-icon">🔒</div>
                         <div class="feature-text">100% Safe & No Bots</div>
                     </div>
@@ -483,25 +611,25 @@
                     <p>No hidden fees. No complicated plans. Just straightforward pricing for real results.</p>
                 </div>
                 <div class="pricing-grid">
-                    <div class="pricing-card animated delay-1">
+                    <div class="pricing-card reveal">
                         <h3>Starter Pack</h3>
                         <p>Perfect for testing the waters and seeing real results.</p>
                         <div class="price">₹50</div>
-                        <p><strong>50 Members</strong></p>
+                        <p><span class="bold-yellow">50 Members</span></p>
                         <a href="#cta" class="cta-button">Get Started</a>
                     </div>
-                    <div class="pricing-card popular animated delay-2">
+                    <div class="pricing-card popular reveal">
                         <h3>Growth Pack</h3>
                         <p>Our most popular option for steady channel growth.</p>
                         <div class="price">₹100</div>
-                        <p><strong>100 Members</strong></p>
+                        <p><span class="bold-yellow">100 Members</span></p>
                         <a href="#cta" class="cta-button">Choose Plan</a>
                     </div>
-                    <div class="pricing-card animated delay-3">
+                    <div class="pricing-card reveal">
                         <h3>Custom Boost</h3>
                         <p>Need more? Get a custom quote for large-scale promotions.</p>
                         <div class="price">₹500+</div>
-                        <p><strong>Custom Amount</strong></p>
+                        <p><span class="bold-yellow">Custom Amount</span></p>
                         <a href="#cta" class="cta-button">Contact for Quote</a>
                     </div>
                 </div>
@@ -514,29 +642,29 @@
                     <h2>Your Questions, Answered</h2>
                     <p>Everything you need to know before you order. If you have more questions, just ask!</p>
                 </div>
-                <div class="faq-container animated delay-1">
-                    <details class="faq-item">
+                <div class="faq-container">
+                    <details class="faq-item reveal">
                         <summary>Is this service safe for my channel?</summary>
                         <div class="faq-answer">
-                            <p>Absolutely. My method is 100% safe and uses only real users. There are no bots, which means no risk to your channel. It's fully compliant with Telegram's terms.</p>
+                            <p>Absolutely. My method is <span class="bold-yellow">100% safe</span> and uses only real users. There are no bots, which means no risk to your channel. It's fully compliant with Telegram's terms.</p>
                         </div>
                     </details>
-                    <details class="faq-item">
+                    <details class="faq-item reveal">
                         <summary>How long does delivery take?</summary>
                         <div class="faq-answer">
-                            <p>Delivery is fast. You'll see subscribers joining within a few hours. The entire order is typically completed within 1 to 3 days, depending on your package size.</p>
+                            <p>Delivery is fast. You'll see subscribers joining within a few hours. The entire order is typically completed within <span class="bold-yellow">1 to 3 days</span>, depending on your package size.</p>
                         </div>
                     </details>
-                    <details class="faq-item">
+                    <details class="faq-item reveal">
                         <summary>Are these subscribers real and active?</summary>
                         <div class="faq-answer">
-                            <p>Yes, all subscribers are 100% real Indian users from my private network of earning-related channels. They are active on Telegram and interested in new opportunities.</p>
+                            <p>Yes, all subscribers are <span class="bold-yellow">100% real Indian users</span> from my private network of earning-related channels. They are active on Telegram and interested in new opportunities.</p>
                         </div>
                     </details>
-                    <details class="faq-item">
+                    <details class="faq-item reveal">
                         <summary>How do I place an order?</summary>
                         <div class="faq-answer">
-                            <p>It's simple! Click the "Contact on Telegram" button, message me with the package you want, and provide your channel link. I'll guide you through the payment and start the promotion.</p>
+                            <p>It's simple! Click the "<span class="bold-yellow">Contact on Telegram</span>" button, message me with the package you want, and provide your channel link. I'll guide you through the payment and start the promotion.</p>
                         </div>
                     </details>
                 </div>
@@ -548,7 +676,7 @@
                 <h2 class="animated">Ready to Go Viral?</h2>
                 <p class="animated delay-1">Stop waiting and start growing. Contact me now for the best and safest promotion service in India.</p>
                 <div class="animated delay-2" style="margin-top: 30px;">
-                    <a href="https://t.me/Newro99" target="_blank" class="final-cta-button">
+                    <a href="https://t.me/Newro99" target="_blank" class="final-cta-button pulse-animation">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-1.37.2-1.64l16.4-6.1c.73-.27 1.36.17 1.15.94l-3.36 15.64c-.24.84-1.15 1.05-1.78.63L12.6 16.3l-1.99 1.9c-.2.2-.37.37-.74.37l.05-.72z"></path></svg>
                         Contact
                     </a>
@@ -563,5 +691,66 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Intersection Observer for scroll-in animations (features, pricing, FAQ items)
+            const revealElements = document.querySelectorAll('.feature-card, .pricing-card, .faq-item');
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Apply active class with a staggered delay
+                        const delay = parseFloat(entry.target.dataset.delay || 0); // Check for data-delay
+                        setTimeout(() => {
+                            entry.target.classList.add('active');
+                        }, delay * 1000); // Convert seconds to milliseconds
+                        observer.unobserve(entry.target); // Stop observing once animated
+                    }
+                });
+            }, {
+                threshold: 0.2 // Trigger when 20% of the element is visible
+            });
+
+            // Apply observer to each reveal element, add a data-delay for staggering
+            revealElements.forEach((el, index) => {
+                // Stagger based on index (you can adjust this logic for different stagger patterns)
+                el.dataset.delay = (index % 3) * 0.15; // Example: groups of 3 with 0.15s delay
+                observer.observe(el);
+            });
+
+            // Smooth animation for FAQ answers (max-height transition)
+            document.querySelectorAll('.faq-item').forEach(details => {
+                details.addEventListener('toggle', () => {
+                    const answer = details.querySelector('.faq-answer');
+                    if (details.open) {
+                        // When opening, set max-height to scrollHeight to allow smooth transition
+                        answer.style.maxHeight = answer.scrollHeight + 20 + 'px'; // +20 for bottom padding
+                    } else {
+                        // When closing, set max-height to 0 after a short delay
+                        // This ensures the transition applies from current height to 0
+                        answer.style.maxHeight = answer.scrollHeight + 20 + 'px'; // Set to current height first
+                        setTimeout(() => {
+                            answer.style.maxHeight = '0';
+                        }, 10); // Small delay to allow CSS to calculate initial height
+                    }
+                });
+            });
+
+            // NEW: Click bubble animation
+            document.addEventListener('click', function(e) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('click-bubble');
+                bubble.style.left = e.clientX + 'px';
+                bubble.style.top = e.clientY + 'px';
+                document.body.appendChild(bubble);
+
+                // Remove the bubble after the animation completes (1 second)
+                setTimeout(() => {
+                    bubble.remove();
+                }, 1000);
+            });
+        });
+    </script>
+
 </body>
-</html>
+                </html>
